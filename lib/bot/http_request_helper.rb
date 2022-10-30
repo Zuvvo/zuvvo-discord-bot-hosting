@@ -5,11 +5,11 @@ class HttpRequestHelper
   attr_reader :uri
 
   def initialize(uri)
-    @uri = uri
+    @uri = URI(uri)
   end
 
   def test_request
-    Net::HTTP.get_response(uri)
+    res = Net::HTTP.get_response(uri)
     res.body if res.is_a?(Net::HTTPSuccess)
   end
 

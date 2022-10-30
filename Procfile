@@ -1,2 +1,2 @@
 web: npm start
-worker: bundle exec ruby bot/bot_init.rb
+worker: bundle exec ruby lib/bot/bot_init.rb
