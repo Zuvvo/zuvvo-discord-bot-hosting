@@ -20,18 +20,20 @@ bot.command :math do |event|
   rand(3..5).times {numbers << rand(0..20) }
   equation = numbers.join(' x ').gsub(/x/) {operators.sample }
   riddle_result = eval(equation)
-  game = MathGame.new('Zuvvo', "#{equation} = ? #{riddle_result}",30, 2, 5)
+  game = MathGame.new('Zuvvo', "#{equation} = ?    (#{riddle_result})",30, 2, 5)
 
   event.respond "#{game.riddle}"
 
-  event.user.await!(timeout: game.time) do |answer|
-    guess = answer.message.content.to_i
+  #message: riddle_result doesnt work as intended
+  bot.add_await!(Discordrb::Events::MessageEvent, message: riddle_result, timeout: 5) do |message_event|
+    guess = message_event.message.content.to_i
     if guess == riddle_result
-      answer.respond "correct #{event.user.name}"
+      winner = message_event.user.name
+      event.respond "Correct, #{winner}!"
+      game.discord_user_name = winner
       respond = requester.send_math_game_data(game)
       true
     else
-      answer.respond "not correct"
       false
     end
   end
@@ -40,6 +42,4 @@ bot.command :math do |event|
 
 end
 
-#at_exit { bot.stop }
 bot.run
-#bot.join
