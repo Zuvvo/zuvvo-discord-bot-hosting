@@ -55,7 +55,7 @@ class MathGame
       players.each {|player| event.respond("Oh, #{player}, you almost won an obrazek. You need to win a game with at least 3 players and 5 rounds to get it.") if SPECIAL_PLAYERS.include?(player) }
       event.respond get_scoreboard if players.size > 0
       if players.size >= 2 then
-        respond = requester.send_math_game_data(game)
+        respond = requester.send_math_game_data(self)
       end
     end
   end
