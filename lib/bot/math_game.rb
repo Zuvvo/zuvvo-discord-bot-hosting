@@ -4,10 +4,12 @@ class MathGame
 
   CROSS_MARK = "\u274c"
   DELAY_BEFORE_STARTING = 2
+  DELAY_BETWEEN_RIDDLES = 3
 
   SPECIAL_PLAYERS = ['xplode']
 
-  attr_accessor :game_host_name, :game_winner, :time_for_answer, :difficulty, :event, :bot, :games_number, :requester, :riddles, :start_game_delay, :players
+  attr_accessor :game_host_name, :game_winner, :time_for_answer, :difficulty, :event,
+                :bot, :games_number, :requester, :riddles, :start_game_delay, :players, :results
 
 
   def initialize(event, host_name, bot, requester, args)
@@ -42,7 +44,7 @@ class MathGame
       else
         event.respond "Starting the game for players: #{players.join(', ')}"
       end
-      games_number.times do start_one_game end
+      games_number.times do |i| start_one_game(i) end
     else
       event.respond "Not enough players. Closing the game."
     end
@@ -51,11 +53,13 @@ class MathGame
       set_results
       players.each {|player| event.respond("Oh, #{player}, you almost won an obrazek. You need to win a game with at least 3 players and 5 rounds to get it.") if SPECIAL_PLAYERS.include?(player) }
       event.respond get_scoreboard if players.size > 0
+      respond = requester.send_math_game_data(game)
     end
   end
 
-  def start_one_game
-    riddle = MathGameRiddle.new(game_host_name, nil, time_for_answer, 0, difficulty, 0, 0)
+  def start_one_game(game_index)
+    bot.add_await!(Discordrb::Events::ReactionAddEvent, timeout: DELAY_BETWEEN_RIDDLES) unless game_index == 0
+    riddle = MathGameRiddle.new(game_host_name, nil, time_for_answer, 0, difficulty, 0, game_index)
     riddle.set_riddle
     event.respond "#{riddle.equation} = ?"
 
@@ -72,7 +76,6 @@ class MathGame
           event.respond "Correct, #{user_name}! The answer is: `#{riddle.result}`."
           riddle.game_winner = user_name
           guessed = true
-          #respond = requester.send_math_game_data(game)
           true
         end
       else
@@ -86,12 +89,12 @@ class MathGame
   end
 
   def set_results
-    @results = {}
+    @results = { }
     @players.each do |player|
-      @results[player] = riddles.count { |el| el.game_winner == player }
+      results[player] = riddles.count { |el| el.game_winner == player }
     end
-    @results = @results.sort_by {|k,v| v}.reverse
-    game_winner = @results.max_by{|k,v| v}
+    results = results.sort_by {|k,v| v}.reverse
+    @game_winner = results.max_by{|k,v| v}
   end
 
   def get_scoreboard

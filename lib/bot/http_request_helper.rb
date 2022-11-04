@@ -16,7 +16,10 @@ class HttpRequestHelper
 
   def send_math_game_data(game)
 
-    params =  { 'username' => game.discord_user_name, 'riddle'=>game.riddle, 'time'=>game.time.to_s, 'difficulty'=>game.difficulty.to_s, 'points'=>game.points.to_s }
+    params =  { 'host' => game.game_host_name, 'winner'=>game.game_winner, 'time'=>game.time.to_s,
+                'difficulty'=>game.difficulty.to_s, 'points'=>game.points.to_s,
+                'results' => game.results.to_s
+    }
 
     x = Net::HTTP.post_form(game_send_uri, params)
     x.body

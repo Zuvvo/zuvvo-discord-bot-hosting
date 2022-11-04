@@ -16,7 +16,8 @@ requester = HttpRequestHelper.new('https://zuvvo-discord-bot.herokuapp.com/', 'h
 bot.command MATH_GAME_START_COMMAND do |event|
   args = event.message.content.split(' ').drop(1)
   if args.size > 0 && args[0] == HELP_COMMAND
-    event.respond BotMessages.help("#{bot.prefix}#{MATH_GAME_START_COMMAND.to_s}")
+    difficulties = (1..4).map { |el| GameDifficulty.get_numbers_count(el) }
+    event.respond BotMessages.help("#{bot.prefix}#{MATH_GAME_START_COMMAND.to_s}", difficulties)
   else
     game = MathGame.new(event, event.user.name, bot, requester, args)
     game.start_game
