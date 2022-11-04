@@ -7,7 +7,7 @@ require 'byebug'
 
 include GameDifficulty
 
-MATH_GAME_START_COMMAND = :maf
+MATH_GAME_START_COMMAND = :math
 HELP_COMMAND = 'help'
 
 bot = Discordrb::Commands::CommandBot.new token: ENV['DISCORD_TOKEN'], prefix: '!'
