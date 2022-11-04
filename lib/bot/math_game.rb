@@ -52,7 +52,7 @@ class MathGame
   def start_one_game
     riddle = MathGameRiddle.new(game_host_name, nil, time_for_answer, 0, difficulty, 0, 0)
     riddle.set_riddle
-    event.respond "#{riddle.equation} = ? (#{riddle.result})"
+    event.respond "#{riddle.equation} = ?"
 
     bot.add_await!(Discordrb::Events::MessageEvent, message: riddle.equation, timeout: time_for_answer) do |message_event|
       guess = message_event.message.content.to_i
