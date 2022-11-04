@@ -62,7 +62,7 @@ class MathGame
 
   def start_one_game(game_index)
     bot.add_await!(Discordrb::Events::ReactionAddEvent, timeout: DELAY_BETWEEN_RIDDLES) unless game_index == 0
-    riddle = MathGameRiddle.new(game_host_name, nil, time_for_answer, 0, difficulty, 0, game_index)
+    riddle = MathGameRiddle.new(game_host_name, nil, time_for_answer, 0, difficulty, game_index)
     riddle.set_riddle
     event.respond "#{riddle.equation} = ?"
 
