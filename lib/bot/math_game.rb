@@ -56,6 +56,7 @@ class MathGame
       event.respond get_scoreboard if players.size > 0
       if players.size >= 2 then
         requester.send_math_game_data(self)
+        ""
       end
     end
   end
