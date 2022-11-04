@@ -8,8 +8,8 @@ class MathGame
 
   SPECIAL_PLAYERS = ['xplode']
 
-  attr_accessor :game_host_name, :game_winner, :time_for_answer, :difficulty, :event,
-                :bot, :games_number, :requester, :riddles, :start_game_delay, :players, :results
+  attr_accessor :game_host_name, :time_for_answer, :difficulty, :event, :bot,
+                :games_number, :requester, :riddles, :start_game_delay, :players, :results
 
 
   def initialize(event, host_name, bot, requester, args)
@@ -96,7 +96,6 @@ class MathGame
       results[player] = riddles.count { |el| el.game_winner == player }
     end
     @results = results.sort_by {|k,v| v}.reverse
-    @game_winner = results.max_by{|k,v| v}
   end
 
   def get_scoreboard
