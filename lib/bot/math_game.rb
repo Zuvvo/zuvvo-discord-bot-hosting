@@ -22,6 +22,7 @@ class MathGame
     @games_number = args.size > 1 && valid_rounds(args[1])? args[1].to_i : 5
     @time_for_answer = args.size > 2 && valid_round_time(args[2])? args[2].to_i : 30
     @start_game_delay = args.size > 3 && valid_game_start_delay(args[3])? args[3].to_i : 30
+    @results = {}
   end
 
   def start_game
@@ -91,16 +92,15 @@ class MathGame
   end
 
   def set_results
-    @results = { }
     @players.each do |player|
       results[player] = riddles.count { |el| el.game_winner == player }
     end
-    results = results.sort_by {|k,v| v}.reverse
+    @results = results.sort_by {|k,v| v}.reverse
     @game_winner = results.max_by{|k,v| v}
   end
 
   def get_scoreboard
-    results_for_scoreboard = @results.map {|k,v| "#{k}: #{v}" + (v == 0 ? " - do you even lift?" : "") }
+    results_for_scoreboard = results.map {|k,v| "#{k}: #{v}" + (v == 0 ? " - do you even lift?" : "") }
     "Game finished. Scoreboard:\n#{results_for_scoreboard.join("\n")}"
   end
 
