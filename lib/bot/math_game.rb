@@ -1,10 +1,12 @@
 class MathGame
   require_relative 'math_game_riddle'
   require_relative 'http_request_helper'
+  require_relative 'bot_message_async'
 
   CROSS_MARK = "\u274c"
-  DELAY_BEFORE_STARTING = 2
+  DELAY_BEFORE_STARTING = 1
   DELAY_BETWEEN_RIDDLES = 3
+  FINAL_COUNTDOWN = 5
 
   SPECIAL_PLAYERS = ['xplode']
 
@@ -23,34 +25,36 @@ class MathGame
     @time_for_answer = args.size > 2 && valid_round_time(args[2])? args[2].to_i : 30
     @start_game_delay = args.size > 3 && valid_game_start_delay(args[3])? args[3].to_i : 30
     @results = {}
+    @bot_msg_async = BotMessageAsync.new(bot)
   end
 
   def start_game
     @riddles = []
     @players = []
 
-    msg = event.respond "Starting new #{ GameDifficulty.get_difficulty_by_value(difficulty) } game. There will be `#{games_number}` rounds and you have `#{time_for_answer}` seconds to solve each riddle. Click on emote below to sign in. Game will start in `#{start_game_delay}` seconds."
-
+    base_msg_text = "Starting new #{ GameDifficulty.get_difficulty_by_value(difficulty) } game. There will be `#{games_number}` rounds and you have `#{time_for_answer}` seconds to solve each riddle. Click on emote below to sign in. You have `#{start_game_delay}` seconds to do it."
+    msg = event.respond base_msg_text
     msg.react CROSS_MARK
 
     bot.add_await!(Discordrb::Events::ReactionAddEvent, message: msg, emoji: CROSS_MARK, timeout: start_game_delay) do |reaction_event|
       players << reaction_event.user.name unless players.include?(reaction_event.user.name)
-      event.respond("I was waiting for you mr. #{reaction_event.user.name}. Don't let me down!") if SPECIAL_PLAYERS.include?(reaction_event.user.name)
+      event.respond(" I was waiting for you mr. #{reaction_event.user.name}. Don't let me down!") if SPECIAL_PLAYERS.include?(reaction_event.user.name)
     end
 
     if players.size > 0 then
       if start_game_delay > DELAY_BEFORE_STARTING then
-        event.respond "Starting the game in `#{DELAY_BEFORE_STARTING}` seconds for players: #{players.join(', ')}"
-        bot.add_await!(Discordrb::Events::ReactionAddEvent, timeout: DELAY_BEFORE_STARTING)
-      else
+
+        FINAL_COUNTDOWN.downto(1) do|i|
+          seconds_left = "`#{i}` #{i == 1 ? 'second' : 'seconds'}"
+          @bot_msg_async.async.edit(msg, base_msg_text, players, seconds_left)
+          bot.add_await!(Discordrb::Events::ReactionAddEvent, timeout: 1)
+        end
+
+        msg.edit base_msg_text
         event.respond "Starting the game for players: #{players.join(', ')}"
+        bot.add_await!(Discordrb::Events::ReactionAddEvent, timeout: DELAY_BEFORE_STARTING)
       end
       games_number.times do |i| start_one_game(i) end
-    else
-      event.respond "Not enough players. Closing the game."
-    end
-
-    if players.size > 0 then
       set_results
       players.each {|player| event.respond("Oh, #{player}, you almost won an obrazek. You need to win a game with at least 3 players and 5 rounds to get it.") if SPECIAL_PLAYERS.include?(player) }
       event.respond get_scoreboard if players.size > 0
@@ -58,6 +62,8 @@ class MathGame
         requester.send_math_game_data(self)
         ""
       end
+    else
+      event.respond "Not enough players. Closing the game."
     end
   end
 
@@ -127,7 +133,7 @@ class MathGame
   end
 
   def valid_game_start_delay(arg)
-    arg.to_i.between?(5, 120)
+    arg.to_i.between?(FINAL_COUNTDOWN, 120)
   end
 
 end

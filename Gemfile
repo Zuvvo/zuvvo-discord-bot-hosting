@@ -41,6 +41,7 @@ gem 'tzinfo-data'
 gem 'discordrb'
 gem 'byebug'
 gem 'figaro'
+gem 'concurrent-ruby', require: 'concurrent'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false

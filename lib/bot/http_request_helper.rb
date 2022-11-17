@@ -16,6 +16,7 @@ class HttpRequestHelper
 
   def send_math_game_data(game)
 
+    puts game.results.to_s
     params =  { 'host' => game.game_host_name, 'time'=>game.time_for_answer.to_s,
                 'difficulty'=>game.difficulty.to_s, 'riddles_count'=>game.riddles.size.to_s,
                 'results' => game.results.to_s

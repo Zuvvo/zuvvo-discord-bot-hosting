@@ -246,6 +246,7 @@ DEPENDENCIES
   bootsnap
   byebug
   capybara
+  concurrent-ruby
   debug
   discordrb
   figaro
