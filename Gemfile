@@ -42,6 +42,8 @@ gem 'discordrb'
 gem 'byebug'
 gem 'figaro'
 gem 'concurrent-ruby', require: 'concurrent'
+gem 'graphql'
+gem 'graphql-client'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false

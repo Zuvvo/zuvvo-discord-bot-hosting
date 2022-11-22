@@ -1,7 +1,8 @@
 class MathGame
   require_relative 'math_game_riddle'
-  require_relative 'http_request_helper'
+  require_relative 'graphql_sender'
   require_relative 'bot_message_async'
+  include GraphqlSender
 
   CROSS_MARK = "\u274c"
   DELAY_BEFORE_STARTING = 1
@@ -11,14 +12,13 @@ class MathGame
   SPECIAL_PLAYERS = ['xplode']
 
   attr_accessor :game_host_name, :time_for_answer, :difficulty, :event, :bot,
-                :games_number, :requester, :riddles, :start_game_delay, :players, :results
+                :games_number, :riddles, :start_game_delay, :players, :results
 
 
-  def initialize(event, host_name, bot, requester, args)
+  def initialize(event, host_name, bot, args)
     @event = event
     @game_host_name = host_name
     @bot = bot
-    @requester = requester
     # puts GameDifficulty.constants
     @difficulty = args.size > 0 && valid_difficulty(args[0]) ? GameDifficulty.const_get(args[0].upcase.to_sym) : 2
     @games_number = args.size > 1 && valid_rounds(args[1])? args[1].to_i : 5
@@ -59,7 +59,7 @@ class MathGame
       players.each {|player| event.respond("Oh, #{player}, you almost won an obrazek. You need to win a game with at least 3 players and 5 rounds to get it.") if SPECIAL_PLAYERS.include?(player) }
       event.respond get_scoreboard if players.size > 0
       if players.size >= 2 then
-        requester.send_math_game_data(self)
+        send_mutation_query(self)
         ""
       end
     else
