@@ -8,7 +8,7 @@ require 'byebug'
 include GameDifficulty
 include GraphqlSender
 
-MATH_GAME_START_COMMAND = :maf
+MATH_GAME_START_COMMAND = :math
 SEND_DATA_TEST = :sendql
 HELP_COMMAND = 'help'
 
